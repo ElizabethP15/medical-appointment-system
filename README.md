@@ -1,8 +1,8 @@
-# 🏥 Medicall Appointment System
+# 🏥 Medical Appointment System
 
 > Sistema web de agendamiento médico con autenticación por roles, gestión de citas y disponibilidad configurable por médico.
 
-🔗 **Demo en producción:** [https://medicall-front.up.railway.app](https://medicall-front.up.railway.app) ← _reemplazá con tu URL real de Railway_
+🔗 **Demo en producción:** [https://medical-appointment-system-frontend-production.up.railway.app](https://medical-appointment-system-frontend-production.up.railway.app)
 
 ---
 
@@ -65,8 +65,6 @@ El sistema valida automáticamente que la cita sea dentro del horario disponible
 
 ![Disponibilidad](./docs/screenshots/disponibilidad.png)
 
-> 📌 _Para agregar los screenshots: corré el proyecto localmente, tomá capturas de cada pantalla y guardalas en `docs/screenshots/` con los nombres indicados._
-
 ---
 
 ## 🚀 Correr el proyecto localmente con Docker Compose
@@ -82,8 +80,8 @@ Esta es la forma más rápida — levanta backend, frontend y base de datos en u
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/TU_USUARIO/medicall-appoimet-system.git
-cd medicall-appoimet-system
+git clone https://github.com/ElizabethP15/medical-appointment-system.git
+cd medical-appointment-system
 
 # 2. Levantar todos los servicios
 docker compose up --build
@@ -119,13 +117,13 @@ Necesitás una instancia de PostgreSQL accesible (Railway, Neon.tech, o local).
 ### Backend
 
 ```bash
-cd back
+cd backend
 
 # Instalar dependencias
 npm install
 
 # Crear archivo de variables de entorno
-cp .env.example .env
+cp .env
 # Editá .env y completá DATABASE_URL con tu URL de PostgreSQL
 
 # Ejecutar migraciones y generar el cliente Prisma
@@ -139,45 +137,18 @@ npm run dev
 ### Frontend
 
 ```bash
-cd front
+cd frontend
 
 # Instalar dependencias
 npm install
 
 # Crear archivo de variables de entorno
-cp .env.example .env
+cp .env
 # Editá .env si el backend no corre en localhost:3001
 
 # Iniciar en modo desarrollo
 npm run dev
 # App disponible en: http://localhost:5173
-```
-
----
-
-## 🔑 Variables de entorno
-
-### `back/.env.example`
-
-```env
-# URL de conexión a PostgreSQL
-DATABASE_URL="postgresql://usuario:contraseña@host:5432/medicall_db"
-
-# Clave secreta para firmar los JWT (mínimo 32 caracteres, aleatoria)
-JWT_SECRET="genera_una_clave_larga_con: node -e \"console.log(require('crypto').randomBytes(64).toString('hex'))\""
-
-# Puerto del servidor
-PORT=3001
-
-# URL del frontend (para configurar CORS)
-FRONTEND_URL="http://localhost:5173"
-```
-
-### `front/.env.example`
-
-```env
-# URL base de la API del backend
-VITE_API_URL="http://localhost:3001/api"
 ```
 
 ---
@@ -234,7 +205,7 @@ medical-appoinment-system/
 
 **Elizabeth Patiño** — Ingeniera Informática  
 📧 elizapatinohenao@gmail.com  
-🔗 [GitHub](https://github.com/TU_USUARIO)
+🔗 [GitHub](https://github.com/ElizabethP15)
 
 ---
 
