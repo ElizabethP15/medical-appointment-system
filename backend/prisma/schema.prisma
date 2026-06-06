@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Configura la conexión. El URL se configura en prisma.config.ts en lugar del schema.
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── ENUM: Rol de usuario ──────────────────────────────────────────────────
+enum Rol {
+  PACIENTE
+  MEDICO
+}
+
+// ─── ENUM: Estado de una cita ─────────────────────────────────────────────
+enum EstadoCita {
+  PENDIENTE // Recién agendada, esperando confirmación
+  CONFIRMADA // El médico la confirmó
+  CANCELADA // Fue cancelada
+  COMPLETADA // La cita ya se realizó
+}
+
+// ─── ENUM: Día de la semana ───────────────────────────────────────────────
+enum DiaSemana {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
+}
+
+// ─── MODELO: Usuario ──────────────────────────────────────────────────────
+model Usuario {
+  id           String   @id @default(uuid()) // UUID: ID único, no secuencial (más seguro)
+  email        String   @unique // @unique = no puede haber dos iguales
+  passwordHash String // Guardamos el hash, NUNCA la contraseña
+  nombre       String
+  apellido     String
+  rol          Rol
+  creadoEn     DateTime @default(now()) // Se llena automáticamente al crear
+
+  // Relaciones: un usuario puede tener un perfil de médico O uno de paciente
+  medico   Medico? // El ? significa "puede no existir"
+  paciente Paciente?
+
+  @@map("usuarios") // Nombre real de la tabla en PostgreSQL
+}
+
+// ─── MODELO: Médico ───────────────────────────────────────────────────────
+model Medico {
+  id           String  @id @default(uuid())
+  especialidad String
+  descripcion  String? // El ? en el tipo significa que puede ser NULL
+
+  // Relación con Usuario: un médico tiene exactamente un usuario
+  usuarioId String  @unique
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  // Un médico puede tener muchos bloques de disponibilidad y muchas citas
+  disponibilidad Disponibilidad[]
+  citas          Cita[]
+
+  @@map("medicos")
+}
+
+// ─── MODELO: Paciente ─────────────────────────────────────────────────────
+model Paciente {
+  id              String    @id @default(uuid())
+  fechaNacimiento DateTime?
+
+  // Relación con Usuario
+  usuarioId String  @unique
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  // Un paciente puede tener muchas citas
+  citas Cita[]
+
+  @@map("pacientes")
+}
+
+// ─── MODELO: Disponibilidad ───────────────────────────────────────────────
+model Disponibilidad {
+  id         String    @id @default(uuid())
+  diaSemana  DiaSemana
+  horaInicio String // Guardamos como "HH:MM", ej: "08:00"
+  horaFin    String // ej: "12:00"
+
+  // Relación con Médico
+  medicoId String
+  medico   Medico @relation(fields: [medicoId], references: [id])
+
+  @@map("disponibilidad")
+}
+
+// ─── MODELO: Cita ─────────────────────────────────────────────────────────
+model Cita {
+  id       String     @id @default(uuid())
+  fecha    DateTime // Fecha y hora exacta de la cita
+  estado   EstadoCita @default(PENDIENTE)
+  motivo   String? // Razón de la consulta (opcional)
+  notas    String? // Notas del médico después de la cita (opcional)
+  creadaEn DateTime   @default(now())
+
+  // Relaciones: cada cita pertenece a un paciente y a un médico
+  pacienteId String
+  paciente   Paciente @relation(fields: [pacienteId], references: [id])
+
+  medicoId String
+  medico   Medico @relation(fields: [medicoId], references: [id])
+
+  @@map("citas")
+}

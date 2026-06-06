@@ -1,98 +1,172 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { pool } from '../config/db'
+import prisma from '../config/prisma'
 
-export const register = async (req: Request, res: Response) => {
-  const { name, email, password, role, specialty, bio } = req.body
-
-  if (!name || !email || !password || !role) {
-    return res.status(400).json({ message: 'All fields are required' })
-  }
-
-  if (!['patient', 'doctor'].includes(role)) {
-    return res.status(400).json({ message: 'Invalid role' })
-  }
-
+// ─── REGISTRO ─────────────────────────────────────────────────────────────
+export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [
-      email,
-    ])
+    const { email, password, nombre, apellido, rol, especialidad } = req.body
 
-    if (existing.rows.length > 0) {
-      return res.status(409).json({ message: 'Email already registered' })
+    // Validación básica de campos obligatorios
+    if (!email || !password || !nombre || !apellido || !rol) {
+      res.status(400).json({ error: 'Todos los campos son obligatorios' })
+      return
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
-    const result = await pool.query(
-      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
-      [name, email, hashedPassword, role],
-    )
-    const newUser = result.rows[0]
+    // Verificamos si el email ya está registrado
+    const usuarioExistente = await prisma.usuario.findUnique({
+      where: { email },
+    })
 
-    // Si es médico, crear registro en tabla doctors
-    if (role === 'doctor') {
-      await pool.query(
-        'INSERT INTO doctors (user_id, specialty, bio) VALUES ($1, $2, $3)',
-        [newUser.id, specialty || 'General', bio || ''],
-      )
+    if (usuarioExistente) {
+      res.status(409).json({ error: 'Este email ya está registrado' })
+      return
     }
 
-    const token = jwt.sign(
-      { userId: newUser.id, role: newUser.role },
-      process.env.JWT_SECRET as string,
-      { expiresIn: '7d' },
-    )
+    // bcrypt.hash() toma la contraseña y la convierte en un hash irreversible.
+    const passwordHash = await bcrypt.hash(password, 12)
 
-    return res.status(201).json({ user: newUser, token })
+    // Creamos el usuario en la BD dentro de una transacción.
+    const resultado = await prisma.$transaction(async (tx: any) => {
+      // 1. Crear el usuario base
+      const nuevoUsuario = await tx.usuario.create({
+        data: {
+          email,
+          passwordHash,
+          nombre,
+          apellido,
+          rol,
+        },
+      })
+
+      // 2. Según el rol, crear el perfil específico
+      if (rol === 'MEDICO') {
+        if (!especialidad) {
+          throw new Error('La especialidad es obligatoria para médicos')
+        }
+        await tx.medico.create({
+          data: {
+            usuarioId: nuevoUsuario.id,
+            especialidad,
+          },
+        })
+      } else if (rol === 'PACIENTE') {
+        await tx.paciente.create({
+          data: {
+            usuarioId: nuevoUsuario.id,
+          },
+        })
+      }
+
+      return nuevoUsuario
+    })
+
+    // Respondemos con 201 Created (no devolvemos el passwordHash por seguridad)
+    res.status(201).json({
+      message: 'Usuario registrado exitosamente',
+      usuario: {
+        id: resultado.id,
+        email: resultado.email,
+        nombre: resultado.nombre,
+        apellido: resultado.apellido,
+        rol: resultado.rol,
+      },
+    })
   } catch (error) {
-    console.error(error)
-    return res.status(500).json({ message: 'Server error' })
+    console.error('Error en registro:', error)
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message })
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor' })
+    }
   }
 }
 
-export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body
-
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password required' })
-  }
-
+// ─── LOGIN ────────────────────────────────────────────────────────────────
+export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [
-      email,
-    ])
+    const { email, password } = req.body
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({ message: 'Invalid credentials' })
+    if (!email || !password) {
+      res.status(400).json({ error: 'Email y contraseña son obligatorios' })
+      return
     }
 
-    const user = result.rows[0]
-    const validPassword = await bcrypt.compare(password, user.password)
+    // Buscamos el usuario por email
+    const usuario = await prisma.usuario.findUnique({
+      where: { email },
+    })
 
-    if (!validPassword) {
-      return res.status(401).json({ message: 'Invalid credentials' })
+    // Si el usuario no existe, damos el mismo mensaje que si la contraseña es incorrecta.
+    if (!usuario) {
+      res.status(401).json({ error: 'Credenciales incorrectas' })
+      return
     }
 
+    // bcrypt.compare() compara el password en texto plano con el hash guardado.
+    const passwordValido = await bcrypt.compare(password, usuario.passwordHash)
+
+    if (!passwordValido) {
+      res.status(401).json({ error: 'Credenciales incorrectas' })
+      return
+    }
+
+    // Generamos el JWT con el payload mínimo necesario
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
-      process.env.JWT_SECRET as string,
-      { expiresIn: '7d' },
+      { userId: usuario.id, rol: usuario.rol }, // Payload
+      process.env.JWT_SECRET!, // Secret (el ! le dice a TS que no es undefined)
+      { expiresIn: '7d' }, // El token expira en 7 días
     )
 
-    return res.json({
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-
+    // Devolvemos el token y datos básicos del usuario
+    res.json({
       token,
+      usuario: {
+        id: usuario.id,
+        email: usuario.email,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        rol: usuario.rol,
+      },
     })
   } catch (error) {
-    console.error(error)
+    console.error('Error en login:', error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
 
-    return res.status(500).json({ message: 'Server error' })
+// ─── PERFIL ───────────────────────────────────────────────────────────────
+// Ruta protegida: devuelve los datos del usuario autenticado
+export const getMe = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // req.user fue adjuntado por el middleware verificarToken
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: req.user!.userId },
+      select: {
+        id: true,
+        email: true,
+        nombre: true,
+        apellido: true,
+        rol: true,
+        creadoEn: true,
+        // Incluimos el perfil según el rol
+        medico: {
+          select: { id: true, especialidad: true, descripcion: true },
+        },
+        paciente: {
+          select: { id: true, fechaNacimiento: true },
+        },
+      },
+    })
+
+    if (!usuario) {
+      res.status(404).json({ error: 'Usuario no encontrado' })
+      return
+    }
+
+    res.json(usuario)
+  } catch (error) {
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 }
