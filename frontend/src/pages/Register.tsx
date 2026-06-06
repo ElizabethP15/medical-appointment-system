@@ -1,136 +1,106 @@
-import { useState, FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../api/axios';
+import { authService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
   const [form, setForm] = useState({
-    name: '',
     email: '',
     password: '',
-    role: 'patient' as 'patient' | 'doctor',
-    specialty: '',
-    bio: '',
+    nombre: '',
+    apellido: '',
+    rol: 'PACIENTE' as 'PACIENTE' | 'MEDICO',
+    especialidad: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  // Manejador genérico para todos los campos del formulario
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (form.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
     setLoading(true);
+
     try {
-      const res = await api.post('/auth/register', form);
-      login(res.data.user, res.data.token);
-      navigate(res.data.user.role === 'doctor' ? '/doctor-dashboard' : '/dashboard');
+      await authService.register(form);
+      // Después de registrarse, hacemos login automáticamente
+      await login(form.email, form.password);
+      navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Try again.');
+      setError(err.response?.data?.error || 'Error al registrarse');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      <h2>Create Account</h2>
+    <div style={{ maxWidth: '400px', margin: '4rem auto', padding: '2rem' }}>
+      <h1>Crear Cuenta</h1>
 
-      {error && <p className="error-msg">{error}</p>}
+      {error && (
+        <div style={{ background: '#fee2e2', color: '#dc2626', padding: '0.75rem', borderRadius: '4px', marginBottom: '1rem' }}>
+          {error}
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
-          <label>Full Name</label>
-          <input
-            name="name"
-            type="text"
-            placeholder="Your full name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '1rem' }}>
+          <label>Nombre</label>
+          <input name="nombre" value={form.nombre} onChange={handleChange} required
+            style={{ display: 'block', width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
         </div>
 
-        <div className="form-group">
+        <div style={{ marginBottom: '1rem' }}>
+          <label>Apellido</label>
+          <input name="apellido" value={form.apellido} onChange={handleChange} required
+            style={{ display: 'block', width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
           <label>Email</label>
-          <input
-            name="email"
-            type="email"
-            placeholder="your@email.com"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
+          <input type="email" name="email" value={form.email} onChange={handleChange} required
+            style={{ display: 'block', width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
         </div>
 
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            name="password"
-            type="password"
-            placeholder="Min. 6 characters"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
+        <div style={{ marginBottom: '1rem' }}>
+          <label>Contraseña</label>
+          <input type="password" name="password" value={form.password} onChange={handleChange} required
+            style={{ display: 'block', width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
         </div>
 
-        <div className="form-group">
-          <label>I am a...</label>
-          <select name="role" value={form.role} onChange={handleChange}>
-            <option value="patient">Patient</option>
-            <option value="doctor">Doctor</option>
+        <div style={{ marginBottom: '1rem' }}>
+          <label>Soy</label>
+          <select name="rol" value={form.rol} onChange={handleChange}
+            style={{ display: 'block', width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}>
+            <option value="PACIENTE">Paciente</option>
+            <option value="MEDICO">Médico</option>
           </select>
         </div>
 
-        {/* Campos extra solo si es médico */}
-        {form.role === 'doctor' && (
-          <>
-            <div className="form-group">
-              <label>Specialty</label>
-              <input
-                name="specialty"
-                type="text"
-                placeholder="e.g. Cardiology, General Medicine"
-                value={form.specialty}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Bio (optional)</label>
-              <textarea
-                name="bio"
-                placeholder="Brief professional description..."
-                value={form.bio}
-                onChange={handleChange}
-                rows={3}
-              />
-            </div>
-          </>
+        {/* Este campo solo aparece si el rol es MEDICO */}
+        {form.rol === 'MEDICO' && (
+          <div style={{ marginBottom: '1rem' }}>
+            <label>Especialidad</label>
+            <input name="especialidad" value={form.especialidad} onChange={handleChange} required
+              style={{ display: 'block', width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
+          </div>
         )}
 
-        <button type="submit" disabled={loading} className="btn-primary">
-          {loading ? 'Creating account...' : 'Create Account'}
+        <button type="submit" disabled={loading}
+          style={{ width: '100%', padding: '0.75rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+          {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
         </button>
       </form>
 
-      <p className="auth-link">
-        Already have an account? <Link to="/login">Sign in</Link>
+      <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+        ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link>
       </p>
     </div>
   );
