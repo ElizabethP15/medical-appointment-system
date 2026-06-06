@@ -1,66 +1,243 @@
-# Medical Appointment System
+# 🏥 Medicall Appointment System
 
-A fullstack web application for managing medical appointments between patients and doctors.
+> Sistema web de agendamiento médico con autenticación por roles, gestión de citas y disponibilidad configurable por médico.
 
-🔗 **Live Demo:** [your-app.railway.app](https://your-app.railway.app)
+🔗 **Demo en producción:** [https://medicall-front.up.railway.app](https://medicall-front.up.railway.app) ← _reemplazá con tu URL real de Railway_
 
 ---
 
-## Features
+## 📋 Descripción del problema que resuelve
 
-- 🔐 JWT Authentication with role-based access (patient / doctor)
+En muchos consultorios y clínicas pequeñas, el proceso de agendar citas sigue siendo manual: llamadas telefónicas, agendas físicas y falta de visibilidad para el paciente sobre su historial. Esto genera:
 
-- 👨‍⚕️ Doctor listing with specialties
+- **Doble agendamiento** por errores de coordinación
+- **Falta de transparencia** — el paciente no sabe si su cita fue confirmada
+- **Carga administrativa** — el médico o recepcionista gestiona todo manualmente
+- **Sin historial accesible** — el paciente no recuerda cuándo fue su última consulta
 
-- 📅 Appointment booking with conflict detection
+**Medicall** resuelve esto con una aplicación web donde:
 
-- 📋 Patient dashboard to view and cancel appointments
+| Actor        | Puede hacer                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------- |
+| **Paciente** | Registrarse, ver médicos disponibles y sus horarios, agendar citas, ver su historial, cancelar citas                |
+| **Médico**   | Configurar su disponibilidad semanal, ver su agenda del día, confirmar o cancelar citas, marcarlas como completadas |
 
-- 🏥 Doctor dashboard to view daily schedule
+El sistema valida automáticamente que la cita sea dentro del horario disponible del médico y que no haya conflicto con otras citas existentes.
 
-- 🐳 Fully containerized with Docker
+---
 
-## Tech Stack
+## 🏗️ Diagrama de arquitectura
 
-| Layer | Technology |
+![Arquitectura del sistema](./docs/architecture.svg)
 
-|-------|-----------|
+> _Para ver el diagrama interactivo en draw.io: abrí el archivo `docs/architecture.svg` desde https://app.diagrams.net_
 
-| Frontend | React 18 + TypeScript + Vite |
+**Stack:**
 
-| Backend | Node.js + Express + TypeScript |
+- **Frontend:** React 18 + TypeScript · Vite · React Router · Axios
+- **Backend:** Node.js + Express + TypeScript
+- **ORM:** Prisma (migraciones + tipos TypeScript automáticos)
+- **Base de datos:** PostgreSQL 16
+- **Autenticación:** JWT (jsonwebtoken + bcryptjs)
+- **Deploy:** Railway (backend + frontend + PostgreSQL)
 
-| Database | PostgreSQL 15 |
+---
 
-| Auth | JWT + bcryptjs |
+## 🖼️ Screenshots
 
-| DevOps | Docker + Docker Compose |
+### Login
 
-| Deploy | Railway |
+![Login](./docs/screenshots/login.png)
 
-## Architecture
+### Dashboard Paciente — Mis Citas
 
-![Architecture Diagram](./architecture.png)
+![Dashboard Paciente](./docs/screenshots/dashboard-paciente.png)
 
-## Getting Started
+### Dashboard Paciente — Agendar Cita
 
-### Prerequisites
+![Agendar Cita](./docs/screenshots/agendar-cita.png)
 
-- Docker and Docker Compose installed
+### Dashboard Médico — Agenda del día
 
-- Node.js 18+ (for local development without Docker)
+![Dashboard Médico](./docs/screenshots/dashboard-medico.png)
 
-### Run with Docker
+### Dashboard Médico — Configurar Disponibilidad
+
+![Disponibilidad](./docs/screenshots/disponibilidad.png)
+
+> 📌 _Para agregar los screenshots: corré el proyecto localmente, tomá capturas de cada pantalla y guardalas en `docs/screenshots/` con los nombres indicados._
+
+---
+
+## 🚀 Correr el proyecto localmente con Docker Compose
+
+Esta es la forma más rápida — levanta backend, frontend y base de datos en un solo comando.
+
+### Prerrequisitos
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) instalado y **corriendo** (verificá que el ícono esté en la barra de tareas)
+- [Git](https://git-scm.com)
+
+### Pasos
 
 ```bash
+# 1. Clonar el repositorio
+git clone https://github.com/TU_USUARIO/medicall-appoimet-system.git
+cd medicall-appoimet-system
 
-git clone https://github.com/ElizabethP15/medical-appointment-system.git
-
-cd medical-appointment-system
-
-cp backend/.env.example backend/.env   # fill in your values
-
-docker-compose up --build
-
-Open http://localhost in your browser.
+# 2. Levantar todos los servicios
+docker compose up --build
 ```
+
+Eso es todo. Docker se encarga de instalar dependencias, compilar y migrar la base de datos.
+
+| Servicio     | URL                              |
+| ------------ | -------------------------------- |
+| Frontend     | http://localhost                 |
+| Backend API  | http://localhost:3001            |
+| Health check | http://localhost:3001/api/health |
+
+```bash
+# Para detener:
+docker compose down
+
+# Para detener y borrar los datos de la BD:
+docker compose down -v
+```
+
+---
+
+## 🛠️ Correr en local SIN Docker (modo desarrollo)
+
+Necesitás una instancia de PostgreSQL accesible (Railway, Neon.tech, o local).
+
+### Prerrequisitos
+
+- [Node.js 20+](https://nodejs.org)
+- Una URL de PostgreSQL (podés usar la de Railway: ver sección Variables de entorno)
+
+### Backend
+
+```bash
+cd back
+
+# Instalar dependencias
+npm install
+
+# Crear archivo de variables de entorno
+cp .env.example .env
+# Editá .env y completá DATABASE_URL con tu URL de PostgreSQL
+
+# Ejecutar migraciones y generar el cliente Prisma
+npx prisma migrate dev
+
+# Iniciar en modo desarrollo (se recarga automáticamente al guardar)
+npm run dev
+# Servidor disponible en: http://localhost:3001
+```
+
+### Frontend
+
+```bash
+cd front
+
+# Instalar dependencias
+npm install
+
+# Crear archivo de variables de entorno
+cp .env.example .env
+# Editá .env si el backend no corre en localhost:3001
+
+# Iniciar en modo desarrollo
+npm run dev
+# App disponible en: http://localhost:5173
+```
+
+---
+
+## 🔑 Variables de entorno
+
+### `back/.env.example`
+
+```env
+# URL de conexión a PostgreSQL
+DATABASE_URL="postgresql://usuario:contraseña@host:5432/medicall_db"
+
+# Clave secreta para firmar los JWT (mínimo 32 caracteres, aleatoria)
+JWT_SECRET="genera_una_clave_larga_con: node -e \"console.log(require('crypto').randomBytes(64).toString('hex'))\""
+
+# Puerto del servidor
+PORT=3001
+
+# URL del frontend (para configurar CORS)
+FRONTEND_URL="http://localhost:5173"
+```
+
+### `front/.env.example`
+
+```env
+# URL base de la API del backend
+VITE_API_URL="http://localhost:3001/api"
+```
+
+---
+
+## 🗂️ Estructura del proyecto
+
+```
+medical-appoinment-system/
+├── backend/                    # API REST — Node.js + Express + TypeScript
+│   ├── prisma/
+│   │   └── schema.prisma    # Definición de la base de datos
+│   ├── src/
+│   │   ├── config/          # Configuración de Prisma
+│   │   ├── controllers/     # Lógica de cada endpoint
+│   │   ├── middleware/       # JWT auth + verificación de roles
+│   │   ├── routes/          # Definición de rutas
+│   │   └── index.ts         # Punto de entrada del servidor
+│   └── Dockerfile
+├── frontend/                   # UI — React + TypeScript + Vite
+│   ├── src/
+│   │   ├── context/         # AuthContext (estado global de sesión)
+│   │   ├── pages/           # Vistas principales
+│   │   ├── components/      # Componentes reutilizables
+│   │   └── services/        # Llamadas a la API (Axios)
+│   ├── Dockerfile
+│   └── nginx.conf
+├── docs/
+│   ├── architecture.svg     # Diagrama de arquitectura
+│   └── screenshots/         # Capturas de pantalla
+├── docker-compose.yml       # Orquestación local completa
+└── README.md
+```
+
+---
+
+## 📡 API Endpoints
+
+| Método | Endpoint                      | Auth | Rol        | Descripción                      |
+| ------ | ----------------------------- | ---- | ---------- | -------------------------------- |
+| POST   | `/api/auth/register`          | No   | -          | Crear cuenta (paciente o médico) |
+| POST   | `/api/auth/login`             | No   | -          | Iniciar sesión, obtener JWT      |
+| GET    | `/api/auth/me`                | Sí   | Cualquiera | Ver perfil propio                |
+| GET    | `/api/medicos`                | No   | -          | Listar todos los médicos         |
+| GET    | `/api/medicos/:id`            | No   | -          | Ver médico + disponibilidad      |
+| PUT    | `/api/medicos/disponibilidad` | Sí   | MEDICO     | Configurar horarios de atención  |
+| GET    | `/api/citas/mis-citas`        | Sí   | Cualquiera | Ver mis citas                    |
+| POST   | `/api/citas`                  | Sí   | PACIENTE   | Agendar una cita                 |
+| PATCH  | `/api/citas/:id/cancelar`     | Sí   | PACIENTE   | Cancelar una cita propia         |
+| PUT    | `/api/citas/:id`              | Sí   | MEDICO     | Confirmar / completar una cita   |
+
+---
+
+## 👩‍💻 Autora
+
+**Elizabeth Patiño** — Ingeniera Informática  
+📧 elizapatinohenao@gmail.com  
+🔗 [GitHub](https://github.com/TU_USUARIO)
+
+---
+
+## 📄 Licencia
+
+MIT — libre para usar y modificar.

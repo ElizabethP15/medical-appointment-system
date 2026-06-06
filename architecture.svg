@@ -1,0 +1,156 @@
+<svg viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+
+  <!-- Background -->
+  <rect width="860" height="520" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="430" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Medicall Appointment System — Arquitectura</text>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ZONE: CLIENT -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <rect x="20" y="60" width="200" height="380" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="120" y="82" text-anchor="middle" font-size="11" font-weight="600" fill="#1d4ed8">CLIENTE (Browser)</text>
+
+  <!-- React box -->
+  <rect x="40" y="96" width="160" height="130" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="120" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">⚛️ React</text>
+  <text x="120" y="133" text-anchor="middle" font-size="10" fill="#1e40af">+ TypeScript</text>
+  <line x1="60" y1="142" x2="180" y2="142" stroke="#93c5fd" stroke-width="1"/>
+  <text x="120" y="158" text-anchor="middle" font-size="10" fill="#374151">Login / Register</text>
+  <text x="120" y="173" text-anchor="middle" font-size="10" fill="#374151">Dashboard Paciente</text>
+  <text x="120" y="188" text-anchor="middle" font-size="10" fill="#374151">Dashboard Médico</text>
+  <text x="120" y="203" text-anchor="middle" font-size="10" fill="#374151">Agendar Cita</text>
+  <text x="120" y="218" text-anchor="middle" font-size="10" fill="#374151">Mis Citas</text>
+
+  <!-- AuthContext box -->
+  <rect x="40" y="242" width="160" height="60" rx="8" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="120" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#3730a3">AuthContext</text>
+  <text x="120" y="278" text-anchor="middle" font-size="10" fill="#4338ca">JWT token en memoria</text>
+  <text x="120" y="293" text-anchor="middle" font-size="10" fill="#4338ca">usuario + rol</text>
+
+  <!-- Axios box -->
+  <rect x="40" y="318" width="160" height="50" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+  <text x="120" y="338" text-anchor="middle" font-size="11" font-weight="700" fill="#713f12">Axios + Interceptors</text>
+  <text x="120" y="354" text-anchor="middle" font-size="10" fill="#92400e">Authorization: Bearer JWT</text>
+
+  <!-- Vite label -->
+  <rect x="40" y="384" width="160" height="36" rx="8" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="120" y="407" text-anchor="middle" font-size="10" fill="#065f46">Build: Vite  ·  Deploy: Railway</text>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ARROWS: Client → Server -->
+  <!-- ══════════════════════════════════════════════════ -->
+
+  <!-- HTTP arrow -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#10b981"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+
+  <line x1="220" y1="200" x2="318" y2="200" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="228" y="182" width="84" height="16" rx="3" fill="#dbeafe"/>
+  <text x="270" y="194" text-anchor="middle" font-size="9" fill="#1d4ed8">HTTP / REST</text>
+
+  <line x1="318" y1="230" x2="220" y2="230" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <rect x="228" y="233" width="84" height="16" rx="3" fill="#d1fae5"/>
+  <text x="270" y="245" text-anchor="middle" font-size="9" fill="#065f46">JSON Response</text>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ZONE: SERVER -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <rect x="330" y="60" width="240" height="380" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="450" y="82" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">SERVIDOR (Railway)</text>
+
+  <!-- Express box -->
+  <rect x="350" y="96" width="200" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="450" y="117" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d">Node.js + Express</text>
+  <text x="450" y="135" text-anchor="middle" font-size="10" fill="#166534">TypeScript · Puerto 3001</text>
+
+  <!-- Middleware box -->
+  <rect x="350" y="162" width="200" height="80" rx="8" fill="#fef9c3" stroke="#facc15" stroke-width="1.5"/>
+  <text x="450" y="181" text-anchor="middle" font-size="11" font-weight="700" fill="#713f12">Middleware</text>
+  <line x1="366" y1="188" x2="534" y2="188" stroke="#fde68a" stroke-width="1"/>
+  <text x="450" y="204" text-anchor="middle" font-size="10" fill="#92400e">🔐 verificarToken (JWT)</text>
+  <text x="450" y="219" text-anchor="middle" font-size="10" fill="#92400e">👤 verificarRol (PACIENTE/MEDICO)</text>
+  <text x="450" y="234" text-anchor="middle" font-size="10" fill="#92400e">🌐 CORS · JSON parser</text>
+
+  <!-- Routes box -->
+  <rect x="350" y="258" width="200" height="90" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="450" y="277" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">Rutas + Controladores</text>
+  <line x1="366" y1="284" x2="534" y2="284" stroke="#86efac" stroke-width="1"/>
+  <text x="450" y="300" text-anchor="middle" font-size="10" fill="#166534">POST /api/auth/register|login</text>
+  <text x="450" y="315" text-anchor="middle" font-size="10" fill="#166534">GET  /api/medicos</text>
+  <text x="450" y="330" text-anchor="middle" font-size="10" fill="#166534">POST /api/citas</text>
+  <text x="450" y="345" text-anchor="middle" font-size="10" fill="#166534">PUT  /api/citas/:id</text>
+
+  <!-- Prisma box -->
+  <rect x="350" y="364" width="200" height="36" rx="8" fill="#f3e8ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="450" y="387" text-anchor="middle" font-size="11" font-weight="700" fill="#6b21a8">Prisma ORM · Client TS</text>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ARROWS: Server → DB -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <line x1="570" y1="220" x2="638" y2="220" stroke="#6b7280" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <rect x="574" y="204" width="60" height="14" rx="3" fill="#f3f4f6"/>
+  <text x="604" y="215" text-anchor="middle" font-size="9" fill="#374151">SQL / Prisma</text>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ZONE: DATABASE -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <rect x="650" y="60" width="190" height="380" rx="10" fill="#fdf4ff" stroke="#e879f9" stroke-width="1.5"/>
+  <text x="745" y="82" text-anchor="middle" font-size="11" font-weight="600" fill="#86198f">BASE DE DATOS (Railway)</text>
+
+  <!-- PostgreSQL box -->
+  <rect x="668" y="96" width="154" height="40" rx="8" fill="#fae8ff" stroke="#c026d3" stroke-width="1.5"/>
+  <text x="745" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#701a75">🐘 PostgreSQL 16</text>
+  <text x="745" y="128" text-anchor="middle" font-size="10" fill="#86198f">Puerto 5432</text>
+
+  <!-- Tables -->
+  <rect x="668" y="150" width="154" height="270" rx="8" fill="#fdf4ff" stroke="#d946ef" stroke-width="1"/>
+
+  <text x="745" y="170" text-anchor="middle" font-size="10" font-weight="700" fill="#701a75">Tablas</text>
+  <line x1="680" y1="176" x2="810" y2="176" stroke="#e879f9" stroke-width="1"/>
+
+  <!-- Usuario -->
+  <rect x="676" y="183" width="138" height="52" rx="5" fill="#fff" stroke="#d946ef" stroke-width="1"/>
+  <text x="745" y="198" text-anchor="middle" font-size="10" font-weight="700" fill="#701a75">usuarios</text>
+  <text x="745" y="212" text-anchor="middle" font-size="9" fill="#6b7280">id · email · passwordHash</text>
+  <text x="745" y="225" text-anchor="middle" font-size="9" fill="#6b7280">nombre · apellido · rol</text>
+
+  <!-- Medico -->
+  <rect x="676" y="243" width="138" height="42" rx="5" fill="#fff" stroke="#d946ef" stroke-width="1"/>
+  <text x="745" y="259" text-anchor="middle" font-size="10" font-weight="700" fill="#701a75">medicos</text>
+  <text x="745" y="275" text-anchor="middle" font-size="9" fill="#6b7280">id · usuarioId · especialidad</text>
+
+  <!-- Disponibilidad -->
+  <rect x="676" y="293" width="138" height="42" rx="5" fill="#fff" stroke="#d946ef" stroke-width="1"/>
+  <text x="745" y="309" text-anchor="middle" font-size="10" font-weight="700" fill="#701a75">disponibilidad</text>
+  <text x="745" y="325" text-anchor="middle" font-size="9" fill="#6b7280">medicoId · diaSemana · horas</text>
+
+  <!-- Paciente -->
+  <rect x="676" y="343" width="60" height="32" rx="5" fill="#fff" stroke="#d946ef" stroke-width="1"/>
+  <text x="706" y="362" text-anchor="middle" font-size="9" font-weight="700" fill="#701a75">pacientes</text>
+
+  <!-- Cita -->
+  <rect x="754" y="343" width="60" height="32" rx="5" fill="#fff" stroke="#d946ef" stroke-width="1"/>
+  <text x="784" y="359" text-anchor="middle" font-size="9" font-weight="700" fill="#701a75">citas</text>
+  <text x="784" y="371" text-anchor="middle" font-size="8" fill="#6b7280">estado·fecha</text>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- JWT FLOW NOTE at bottom -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <rect x="20" y="456" width="820" height="50" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="430" y="473" text-anchor="middle" font-size="10" font-weight="700" fill="#9a3412">Flujo JWT:</text>
+  <text x="430" y="491" text-anchor="middle" font-size="10" fill="#7c2d12">
+    Login → bcrypt verifica password → jwt.sign({ userId, rol }, SECRET) → token → frontend guarda en memoria → cada request: Authorization: Bearer token → jwt.verify() → req.user
+  </text>
+
+</svg>
