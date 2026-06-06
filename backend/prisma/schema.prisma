@@ -5,6 +5,7 @@ generator client {
 // Configura la conexión. El URL se configura en prisma.config.ts en lugar del schema.
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ─── ENUM: Rol de usuario ──────────────────────────────────────────────────
