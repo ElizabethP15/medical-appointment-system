@@ -1,5 +1,5 @@
-# Imagen base: Node.js 20 en Alpine (Alpine es una versión minimalista de Linux, muy liviana)
-FROM node:20-alpine
+# Imagen base: Node.js 22 en Debian Slim para una imagen más ligera
+FROM node:22-slim
 
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -22,7 +22,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # Puerto que exponemos (el mismo que en .env)
-EXPOSE 3001
+# EXPOSE 3001 # Descomentar si se compila TypeScript a JavaScript
 
 # Comando que se ejecuta al iniciar el contenedor
 # Primero aplica migraciones, luego inicia el servidor
