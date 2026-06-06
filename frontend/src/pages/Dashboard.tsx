@@ -102,7 +102,7 @@ export default function Dashboard() {
               key={apt.id}
               appointment={apt}
               viewAs="patient"
-              onCancel={handleCancel}
+              onCancel={(appointment) => { handleCancel(Number(appointment.id)); }}
             />
           ))}
         </div>
