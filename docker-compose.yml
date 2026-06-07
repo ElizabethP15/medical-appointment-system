@@ -4,11 +4,11 @@ services:
   # ── Base de datos PostgreSQL ──────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
-    container_name: medicall_db
+    container_name: medical_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: medicall_db
+      POSTGRES_DB: medical_db
     ports:
       - '5432:5432'
     volumes:
@@ -22,12 +22,12 @@ services:
 
   # ── Backend Node.js ────────────────────────────────────────────────────────
   back:
-    build: ./back
-    container_name: medicall_backend
+    build: ./backend
+    container_name: medical_backend
     environment:
       # Nota: el host es "postgres" (nombre del servicio de arriba, no localhost)
       # Dentro de la red de Docker, los contenedores se comunican por nombre de servicio
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/medicall_db
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/medical_db
       JWT_SECRET: cambia_esto_por_una_clave_muy_larga_y_aleatoria
       PORT: 3001
       NODE_ENV: production
@@ -42,15 +42,12 @@ services:
   # ── Frontend React ─────────────────────────────────────────────────────────
   front:
     build:
-      context: ./front
+      context: ./frontend
       args:
         VITE_API_URL: http://localhost:3001/api
-    container_name: medicall_frontend
+    container_name: medical_frontend
     ports:
       - '80:80'
     depends_on:
       - back
     restart: unless-stopped
-
-volumes:
-  postgres_data:
