@@ -2,7 +2,7 @@
 
 > Sistema web de agendamiento médico con autenticación por roles, gestión de citas y disponibilidad configurable por médico.
 
-🔗 **Demo en producción:** [https://medical-appointment-system-frontend-production.up.railway.app](https://medical-appointment-system-frontend-production.up.railway.app)
+🔗 **Demo en producción:** [Medical system](https://mas-frontend-production-1.up.railway.app)
 
 ---
 
